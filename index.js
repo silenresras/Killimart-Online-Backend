@@ -12,7 +12,7 @@ dotenv.config();
 const PORT = process.env.PORT || 7000
 const app = express()
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+app.use(cors({ origin: 'https://mern-full-authentication-frontend.vercel.app', credentials: true }))
 
 //middleware
 app.use(express.json())
