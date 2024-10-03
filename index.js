@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 7000
 const app = express()
 
 app.use(cors({
-    origin: "mern-full-authentication-frontend.vercel.app",
+    origin: "https://mern-full-authentication-frontend.vercel.app",
     credentials: true
 }))
 
