@@ -12,7 +12,9 @@ dotenv.config();
 const PORT = process.env.PORT || 7000
 const app = express()
 
-const allowedOrigins = [process.env.CLIENT_URL, "https://your-vercel-frontend-domain.vercel.app"];
+
+
+const allowedOrigins = [process.env.CLIENT_URL, "https://your-vercel-frontend-domain.vercel.app",];
 
 app.use(cors({
     origin: function (origin, callback) {
