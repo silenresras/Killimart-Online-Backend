@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken'
 
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js'
@@ -98,7 +99,7 @@ export const login = async (req, res) => {
         }
 
         //jwt
-        generateTokenAndSetCookie(res, user._id)
+        const token = generateTokenAndSetCookie(res, user._id)
 
         //update login date
         user.lastLogin = new Date()
@@ -111,7 +112,8 @@ export const login = async (req, res) => {
             user: {
                 ...user._doc,
                 password: undefined,
-            }
+            },
+            token: token,
         })
 
 
@@ -186,17 +188,20 @@ export const resetPassword = async (req, res) => {
     }
 }
 
-export const checkAuth = async (req, res) => {
-    try {
-        const user = await User.findOne(req.userId).select("-password")
+export const checkAuth = (req, res) => {
+    const token = req.cookies.token;
 
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'User not found' })
-        }
-
-        res.json({ success: true, user })
-    } catch (error) {
-        console.log("Error checking auth", error)
-        res.status(500).json({ success: false, message: "server error" })
+    if (!token) {
+        return res.status(401).json({ isAuthenticated: false });
     }
-}
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = { userId: decoded.userId }; // Retrieve user details if necessary
+        res.json({ isAuthenticated: true, user });
+    } catch (error) {
+        console.error("Token verification failed:", error);
+        res.status(401).json({ isAuthenticated: false });
+    }
+};
+
