@@ -1,3 +1,4 @@
+
 import jwt from 'jsonwebtoken';
 
 export const generateTokenAndSetCookie = (res, userId) => {
@@ -13,3 +14,4 @@ export const generateTokenAndSetCookie = (res, userId) => {
 
     return token;
 };
+

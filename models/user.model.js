@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
-    }
+    },
+    verificationTokenExpiresAt: Date
 }, { timestamps: true })
 
 export const User = mongoose.model('User', userSchema)

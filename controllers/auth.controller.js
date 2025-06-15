@@ -6,7 +6,6 @@ import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js'
 import { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from '../mailtrap/email.js'
 
-
 export const signUp = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -91,27 +90,26 @@ export const verifyEmail = async (req, res) => {
 
 }
 export const login = async (req, res) => {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email })
+        const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: 'User not found' })
+            return res.status(400).json({ success: false, message: 'User not found' });
         }
 
         const isPasswordMatch = await bcryptjs.compare(password, user.password);
 
         if (!isPasswordMatch) {
-            return res.status(400).json({ success: false, message: 'Incorrect password' })
+            return res.status(400).json({ success: false, message: 'Incorrect password' });
         }
 
-        //jwt
-        const token = generateTokenAndSetCookie(res, user._id)
+        // Generate JWT and set as cookie
+        const token = generateTokenAndSetCookie(res, user._id);
 
-        //update login date
-        user.lastLogin = new Date()
-
+        // Update last login date
+        user.lastLogin = new Date();
         await user.save();
 
         res.status(200).json({
@@ -121,18 +119,18 @@ export const login = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                isAdmin: user.role === 'admin',  // ✅ Convert role to isAdmin
+                isAdmin: user.role === 'admin',
                 lastLogin: user.lastLogin,
             },
-            token: token,
+            token: token
         });
 
-
     } catch (error) {
-        console.log("Error logging in the user", error)
-        res.status(500).json({ success: false, message: "server error" })
+        console.log("Error logging in the user", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
-}
+};
+
 
 
 
@@ -199,11 +197,12 @@ export const resetPassword = async (req, res) => {
     }
 }
 
+
 export const checkAuth = async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.json({ isAuthenticated: false });
+        return res.status(401).json({ isAuthenticated: false });
     }
 
     try {
@@ -247,5 +246,6 @@ export const getMe = async (req, res) => {
       console.error("failed:", error);
       res.status(500).json({ message: "Failed to get user info" });
     }
-  };
   
+};
+

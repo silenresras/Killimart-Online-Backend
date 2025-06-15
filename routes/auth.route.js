@@ -18,6 +18,20 @@ router.post('/forgot-password', forgotPassword)
 
 router.post('/reset-password/:token', resetPassword)
 
+
+//signup
+router.post('/signup', signUp)
+
+//verifyEmail
+router.post('/verify-email', verifyEmail)
+
+//login
+router.post('/login', login)
+
+router.post('/forgot-password', forgotPassword)
+router.post('/reset-password/:token', resetPassword)
+
+//logout
 router.post('/logout', logout)
 
 export default router
