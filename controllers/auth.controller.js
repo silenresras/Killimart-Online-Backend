@@ -218,8 +218,7 @@ export const checkAuth = async (req, res) => {
             isAuthenticated: true,
             user: {
                 _id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
+                name: user.name,
                 email: user.email,
                 role: user.role,
                 lastLogin: user.lastLogin,
@@ -237,8 +236,7 @@ export const getMe = async (req, res) => {
       const user = await User.findById(req.user._id).select('-password');
       res.json({
         _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,  
+        name:  user.name,  
         email: user.email,
         role: user.role,
       });
