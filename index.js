@@ -15,18 +15,20 @@ const PORT = process.env.PORT || 7000
 const app = express()
 
 
-const allowedOrigins = [process.env.CLIENT_URL];
+const allowedOrigins = process.env.CLIENT_URL.split(",");
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (allowedOrigins.includes(origin) || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin); // ← move this line here
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    credentials: true
-}));
+    credentials: true,
+  }));
+  
 
 //middleware
 app.use(express.json())
