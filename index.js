@@ -7,6 +7,11 @@ import { connectDB } from './db/connectDB.js';
 import router from './routes/auth.route.js';
 import uploadRoutes from './routes/upload.route.js';
 import productRoutes from './routes/product.route.js';
+import categoryRoutes from './routes/category.route.js'
+import MpesaRoutes from './routes/mpesa.route.js';
+
+
+
 
 const authRoutes = router
 dotenv.config();
@@ -39,6 +44,8 @@ app.use(cookieParser()) //allows us to parse incoming cookies
 app.use("/api/auth", authRoutes)
 app.use("/api", uploadRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/mpesa", MpesaRoutes);
 
 
 

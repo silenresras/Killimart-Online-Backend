@@ -1,6 +1,9 @@
 import crypto from 'crypto';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken'
+import { decode } from "js-base64";
+import { encode } from 'js-base64';
+
 
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js'
@@ -140,63 +143,78 @@ export const logout = async (req, res) => {
 }
 
 export const forgotPassword = async (req, res) => {
-    const { email } = req.body
-
+    const { email } = req.body;
+  
     try {
-        const user = await User.findOne({ email })
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'User not found' })
-        }
-
-        const resetToken = crypto.randomBytes(20).toString("hex")
-        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000 //1 hour
-
-        user.resetPasswordToken = resetToken
-        user.resetPasswordExpiresAt = resetTokenExpiresAt
-
-        await user.save()
-
-        //send email
-        await sendResetPasswordEmail(user.email, `${process.env.CLIENT_URL}/reset-password/${resetToken}`)
-
-        res.status(200).json({ success: true, message: 'Reset password link sent to your email' })
-
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res
+          .status(400)
+          .json({ success: false, message: "User not found" });
+      }
+  
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenExpiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
+  
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpiresAt = resetTokenExpiresAt;
+  
+      await user.save();
+  
+      // Generate uidb64 and reset URL
+      const uidb64 = encode(user._id.toString()); // base64 encode user ID
+      const resetURL = `${process.env.CLIENT_URL}/auth/reset-password/${uidb64}/${resetToken}`;
+  
+      await sendResetPasswordEmail(user.email, resetURL);
+  
+      res.status(200).json({
+        success: true,
+        message: "Reset password link sent to your email",
+      });
     } catch (error) {
-        console.log("Error fetching user for forgot password", error)
-        res.status(500).json({ success: false, message: "server error" })
+      console.error("Error in forgotPassword:", error);
+      res.status(500).json({ success: false, message: "Server error" });
     }
+  };
 
-}
-
-export const resetPassword = async (req, res) => {
+  export const resetPassword = async (req, res) => {
+    const { uidb64, token } = req.params;
+    const { password } = req.body;
+  
     try {
-        const { token } = req.params
-        const { password } = req.body
-
-        const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpiresAt: { $gt: Date.now() } })
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'Invalid reset password token or expired' })
-        }
-
-        //update password
-        const hashedPassword = await bcryptjs.hash(password, 10);
-        user.password = hashedPassword
-        user.resetPasswordToken = undefined
-        user.resetPasswordExpiresAt = undefined
-
-        await user.save()
-
-        await sendResetSuccessEmail(user.email)
-
-        res.status(200).json({ success: true, message: 'Password reset successfully' })
+      const userId = decode(uidb64); // decode user ID
+  
+      const user = await User.findOne({
+        _id: userId,
+        resetPasswordToken: token,
+        resetPasswordExpiresAt: { $gt: Date.now() },
+      });
+  
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid or expired token",
+        });
+      }
+  
+      const hashedPassword = await bcryptjs.hash(password, 10);
+      user.password = hashedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpiresAt = undefined;
+  
+      await user.save();
+  
+      await sendResetSuccessEmail(user.email);
+  
+      res
+        .status(200)
+        .json({ success: true, message: "Password reset successful" });
     } catch (error) {
-        console.log("Error resetting password", error)
-        res.status(500).json({ success: false, message: "server error" })
+      console.error("Error in resetPassword:", error);
+      res.status(500).json({ success: false, message: "Server error" });
     }
-}
-
+  };
 
 export const checkAuth = async (req, res) => {
     const token = req.cookies.token;
