@@ -1,5 +1,7 @@
 import express from 'express'
-import { signUp, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, getMe } from '../controllers/auth.controller.js';
+import { signUp, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, getMe, addShippingAddress,
+    deleteShippingAddress, editShippingAddress,
+    getShippingAddresses, getDefaultShippingAddress} from '../controllers/auth.controller.js';
 import { protect } from '../middleware/protect.js';
 import { isAdmin } from '../middleware/isAdmin.js';
 
@@ -34,5 +36,11 @@ router.post('/reset-password/:token', resetPassword)
 
 //logout
 router.post('/logout', logout)
+
+router.post("/shipping-address", protect, addShippingAddress);
+router.delete("/shipping-address/:addressId", protect, deleteShippingAddress);
+router.get("/shipping-address", protect, getShippingAddresses);
+router.put("/shipping-address/:addressId", protect, editShippingAddress);
+router.get("/shipping-address/default", protect, getDefaultShippingAddress);
 
 export default router

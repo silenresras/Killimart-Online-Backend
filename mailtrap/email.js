@@ -3,20 +3,23 @@ import { VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_
 import { transporter, sender } from "./nodemailer.config.js";
 
 // Send Verification Email
-export const sendVerificationEmail = async (email, verificationToken) => {
+export const sendVerificationEmail = async (email, name, verificationToken) => {
     try {
-        const response = await transporter.sendMail({
-            from: `${sender.name} <${sender.email}>`,
-            to: email,
-            subject: "Verify Your Email",
-            html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationToken),
-        });
-        console.log("Verification email sent successfully", response);
+      const response = await transporter.sendMail({
+        from: `${sender.name} <${sender.email}>`,
+        to: email,
+        subject: "Verify Your Email",
+        html: VERIFICATION_EMAIL_TEMPLATE
+          .replace("{userName}", name)
+          .replace("{verificationCode}", verificationToken),
+      });
+      console.log("Verification email sent successfully", response);
     } catch (error) {
-        console.error("Error sending verification email", error);
-        throw new Error("Error sending verification email");
+      console.error("Error sending verification email", error);
+      throw new Error("Error sending verification email");
     }
-};
+  };
+  
 
 // Send Welcome Email
 export const sendWelcomeEmail = async (email, name) => {
@@ -25,7 +28,7 @@ export const sendWelcomeEmail = async (email, name) => {
             from: `${sender.name} <${sender.email}>`,
             to: email,
             subject: "Welcome to Our Service",
-            html: `<p>Hi ${name},</p><p>Welcome to Auth Company! We’re glad to have you on board.</p>`,
+            html: `<p>Hi ${name},</p><p>Welcome to Killimart Online Selling! We’re glad to have you on board.</p>`,
         });
         console.log("Welcome email sent successfully", response);
     } catch (error) {

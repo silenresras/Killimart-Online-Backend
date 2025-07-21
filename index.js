@@ -9,6 +9,7 @@ import uploadRoutes from './routes/upload.route.js';
 import productRoutes from './routes/product.route.js';
 import categoryRoutes from './routes/category.route.js'
 import MpesaRoutes from './routes/mpesa.route.js';
+import orderRoutes from './routes/order.route.js'
 
 
 
@@ -46,6 +47,7 @@ app.use("/api", uploadRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/mpesa", MpesaRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 

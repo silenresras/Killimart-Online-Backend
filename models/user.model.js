@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
 
+
+const shippingAddressSchema = new mongoose.Schema({
+    county: { type: String, required: true },
+    subCounty: { type: String, required: true },
+    town: { type: String, required: true },
+    phoneNumber: { type: String, required: true, match: [/^07\d{8}$/, "Phone number must be a valid Kenyan number"] },
+    shippingFee: { type: Number, default: 0 },
+    isDefault: { type: Boolean, default: false },
+  }, { timestamps: true, _id: true });
+  
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -14,6 +25,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    shippingAddress: [shippingAddressSchema],
     lastLogin: {
         type: Date,
         default: Date.now

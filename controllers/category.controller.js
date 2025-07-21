@@ -1,5 +1,5 @@
 import Category from "../models/category.model.js";
-
+import Product from '../models/product.model.js'
 
 
 // Create a new category
@@ -92,3 +92,23 @@ export const deleteCategory = async (req, res) => {
     res.status(500).json({ error: "Error deleting category" });
   }
 };
+
+export const getProductsByCategory = async (req, res) => {
+  const categoryName = req.query.category;
+
+  try {
+    // Find the category object first by name
+    const category = await Category.findOne({ name: categoryName });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    // Now find products with the matching category ID
+    const products = await Product.find({ category: category._id });
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products by category", error });
+  }
+};
+

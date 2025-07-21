@@ -45,7 +45,8 @@ export const signUp = async (req, res) => {
         //jwt
         generateTokenAndSetCookie(res, user._id)
 
-        await sendVerificationEmail(user.email, verificationToken)
+        await sendVerificationEmail(user.email, user.name, verificationToken);
+
 
         res.status(201).json({
             success: true,
@@ -78,7 +79,7 @@ export const verifyEmail = async (req, res) => {
         user.verificationTokenExpiresAt = undefined
         await user.save()
 
-        await sendWelcomeEmail(user.email, user.name)
+        await sendWelcomeEmail(user.email, user.name);
 
         res.status(200).json({
             success: true, message: 'Email verified successfully', user: {
@@ -264,4 +265,185 @@ export const getMe = async (req, res) => {
     }
   
 };
+
+export const addShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { county, subCounty, town, phoneNumber, isDefault } = req.body;
+
+    if (!county || !subCounty || !town || !phoneNumber) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const shippingFee = county.toLowerCase() === "nyeri" ? 0 : 300;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Unset other default addresses
+    if (isDefault) {
+      user.shippingAddress.forEach((addr) => (addr.isDefault = false));
+    }
+
+    user.shippingAddress.push({
+      county,
+      subCounty,
+      town,
+      phoneNumber,
+      shippingFee,
+      isDefault: isDefault || false,
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      message: "Shipping address added successfully",
+      shippingAddress: user.shippingAddress,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+export const deleteShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const addressId = req.params.addressId;
+
+    if (!addressId) {
+      return res.status(400).json({ message: "Address ID is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const addressExists = user.shippingAddress.some(
+      (addr) => addr._id.toString() === addressId
+    );
+
+    if (!addressExists) {
+      return res.status(404).json({ message: "Shipping address not found" });
+    }
+
+    // ✅ Remove address by filtering it out
+    user.shippingAddress = user.shippingAddress.filter(
+      (addr) => addr._id.toString() !== addressId
+    );
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Shipping address deleted successfully",
+      shippingAddress: user.shippingAddress,
+    });
+  } catch (error) {
+    console.error("Delete Shipping Address Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+
+
+// In controller
+export const getShippingAddresses = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select("shippingAddress");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    console.log("DEBUG: Shipping addresses found =>", user.shippingAddress);
+
+    res.status(200).json({
+      shippingAddress: user.shippingAddress,
+    });
+  } catch (err) {
+    console.error("Get addresses error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+export const editShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const addressId = req.params.addressId; // ✅ FIXED
+    const { county, subCounty, town, phoneNumber, isDefault } = req.body;
+
+    console.log("DEBUG BODY & PARAMS:", {
+      addressId,
+      county,
+      subCounty,
+      town,
+      phoneNumber,
+      isDefault
+    });
+    
+
+    if (!addressId || !county || !subCounty || !town || !phoneNumber) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const shippingFee = county.toLowerCase() === "nyeri" ? 0 : 300;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const address = user.shippingAddress.id(addressId);
+    if (!address) return res.status(404).json({ message: "Address not found" });
+
+    if (isDefault) {
+      user.shippingAddress.forEach((addr) => (addr.isDefault = false));
+    }
+
+    address.county = county;
+    address.subCounty = subCounty;
+    address.town = town;
+    address.phoneNumber = phoneNumber;
+    address.shippingFee = shippingFee;
+    address.isDefault = isDefault || false;
+
+    user.markModified("shippingAddress");
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Shipping address updated successfully",
+      shippingAddress: user.shippingAddress,
+    });
+  } catch (err) {
+    console.error("Edit error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+export const getDefaultShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select("shippingAddress");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const defaultAddress = user.shippingAddress.find(addr => addr.isDefault === true);
+
+    if (!defaultAddress) {
+      return res.status(404).json({ message: "No default shipping address found" });
+    }
+
+    res.status(200).json({ defaultAddress });
+  } catch (err) {
+    console.error("Error fetching default address:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
 
