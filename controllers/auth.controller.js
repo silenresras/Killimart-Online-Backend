@@ -328,7 +328,7 @@ export const deleteShippingAddress = async (req, res) => {
       return res.status(404).json({ message: "Shipping address not found" });
     }
 
-    // ✅ Remove address by filtering it out
+    // Remove address by filtering it out
     user.shippingAddress = user.shippingAddress.filter(
       (addr) => addr._id.toString() !== addressId
     );
@@ -358,7 +358,6 @@ export const getShippingAddresses = async (req, res) => {
     const user = await User.findById(userId).select("shippingAddress");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    console.log("DEBUG: Shipping addresses found =>", user.shippingAddress);
 
     res.status(200).json({
       shippingAddress: user.shippingAddress,
@@ -374,7 +373,7 @@ export const getShippingAddresses = async (req, res) => {
 export const editShippingAddress = async (req, res) => {
   try {
     const userId = req.user.id;
-    const addressId = req.params.addressId; // ✅ FIXED
+    const addressId = req.params.addressId; 
     const { county, subCounty, town, phoneNumber, isDefault } = req.body;
 
     console.log("DEBUG BODY & PARAMS:", {

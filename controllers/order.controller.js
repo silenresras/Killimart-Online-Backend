@@ -1,11 +1,11 @@
 // controllers/order.controller.js
 import Order from '../models/order.model.js';
 
-// ✅ 1. Place Order
+//  1. Place Order
 export const placeOrder = async (req, res) => {
   try {
     const { items, shippingAddress, totalAmount } = req.body;
-    const paymentMethod = 'M-Pesa'; // You can also allow dynamic payment method if needed
+    const paymentMethod = 'M-Pesa';
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'No items in the order' });
@@ -27,7 +27,7 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-// ✅ 2. Get My Orders (For Logged In User)
+// 2. Get My Orders (For Logged In User)
 export const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -37,7 +37,7 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
-// ✅ 3. Get All Orders (For Admin)
+//  3. Get All Orders (For Admin)
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
@@ -49,7 +49,7 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// ✅ 4. Update Order Status
+//  4. Update Order Status
 export const updateOrderStatus = async (req, res) => {
   try {
     const { paymentStatus, deliveryStatus } = req.body;
