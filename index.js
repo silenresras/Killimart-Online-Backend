@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
 
 import { connectDB } from './db/connectDB.js';
 import router from './routes/auth.route.js';
@@ -10,9 +11,6 @@ import productRoutes from './routes/product.route.js';
 import categoryRoutes from './routes/category.route.js'
 import MpesaRoutes from './routes/mpesa.route.js';
 import orderRoutes from './routes/order.route.js'
-
-
-
 
 const authRoutes = router
 dotenv.config();
@@ -43,7 +41,8 @@ app.use(
 
 //middleware
 app.use(express.json())
-app.use(cookieParser()) 
+app.use(cookieParser())
+app.use(helmet());
 
 
 //routing  
@@ -57,7 +56,16 @@ app.use('/api/orders', orderRoutes);
 
 
 
-app.listen(PORT, () => {
-    connectDB()
-    console.log('Server is running on port', PORT)
-})
+const startServer = async () => {
+  try {
+    await connectDB()
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`)
+    });
+  } catch (error) {
+    console.error("Failed to connect to DB", error)
+  }
+}
+
+startServer()
+

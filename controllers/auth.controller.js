@@ -269,7 +269,7 @@ export const getMe = async (req, res) => {
 
 export const addShippingAddress = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { county, subCounty, town, phoneNumber, isDefault } = req.body;
 
     if (!county || !subCounty || !town || !phoneNumber) {
@@ -354,7 +354,7 @@ export const deleteShippingAddress = async (req, res) => {
 // In controller
 export const getShippingAddresses = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const user = await User.findById(userId).select("shippingAddress");
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -373,19 +373,9 @@ export const getShippingAddresses = async (req, res) => {
 
 export const editShippingAddress = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const addressId = req.params.addressId; 
     const { county, subCounty, town, phoneNumber, isDefault } = req.body;
-
-    console.log("DEBUG BODY & PARAMS:", {
-      addressId,
-      county,
-      subCounty,
-      town,
-      phoneNumber,
-      isDefault
-    });
-    
 
     if (!addressId || !county || !subCounty || !town || !phoneNumber) {
       return res.status(400).json({ message: "All fields are required" });
@@ -427,7 +417,7 @@ export const editShippingAddress = async (req, res) => {
 
 export const getDefaultShippingAddress = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const user = await User.findById(userId).select("shippingAddress");
 
     if (!user) return res.status(404).json({ message: "User not found" });

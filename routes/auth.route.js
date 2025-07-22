@@ -1,46 +1,27 @@
-import express from 'express'
+import express from 'express';
 import { signUp, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, getMe, addShippingAddress,
     deleteShippingAddress, editShippingAddress,
     getShippingAddresses, getDefaultShippingAddress} from '../controllers/auth.controller.js';
 import { protect } from '../middleware/protect.js';
-import { isAdmin } from '../middleware/isAdmin.js';
 
-const router = express.Router();
-
-router.get('/check-auth', protect, checkAuth) 
-    
+const router = express.Router()
+// Auth
 router.post('/signup', signUp)
-
 router.post('/verify-email', verifyEmail)
-
-router.get('/me',protect, getMe)
-
 router.post('/login', login)
+router.post('/logout', logout)
+router.get('/check-auth', protect, checkAuth)
+router.get('/me', protect, getMe)
 
-router.post('/forgot-password', forgotPassword)
-
-router.post('/reset-password/:uidb64/:token', resetPassword);
-
-
-//signup
-router.post('/signup', signUp)
-
-//verifyEmail
-router.post('/verify-email', verifyEmail)
-
-//login
-router.post('/login', login)
-
+// Password
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token', resetPassword)
 
-//logout
-router.post('/logout', logout)
-
-router.post("/shipping-address", protect, addShippingAddress);
-router.delete("/shipping-address/:addressId", protect, deleteShippingAddress);
-router.get("/shipping-address", protect, getShippingAddresses);
-router.put("/shipping-address/:addressId", protect, editShippingAddress);
-router.get("/shipping-address/default", protect, getDefaultShippingAddress);
+// Shipping
+router.post("/shipping-address", protect, addShippingAddress)
+router.delete("/shipping-address/:addressId", protect, deleteShippingAddress)
+router.put("/shipping-address/:addressId", protect, editShippingAddress)
+router.get("/shipping-address", protect, getShippingAddresses)
+router.get("/shipping-address/default", protect, getDefaultShippingAddress)
 
 export default router
