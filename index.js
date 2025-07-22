@@ -21,18 +21,24 @@ const PORT = process.env.PORT || 7000
 const app = express()
 
 
-const allowedOrigins = process.env.CLIENT_URL
+const allowedOrigins = [
+  'https://killimart.vercel.app', // Your deployed frontend
+  'http://localhost:3000',        // Local development
+];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
 
 
 //middleware
