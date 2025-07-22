@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 7000
 const app = express()
 
 
-const allowedOrigins = process.env.CLIENT_URL.split(",");
+const allowedOrigins = process.env.CLIENT_URL
 
 app.use(cors({
   origin: (origin, callback) => {

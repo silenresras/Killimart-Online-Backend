@@ -7,7 +7,7 @@ import { isAdmin } from '../middleware/isAdmin.js';
 
 const router = express.Router();
 
-router.get('/check-auth', protect, checkAuth, isAdmin)
+router.get('/check-auth', protect, checkAuth) 
     
 router.post('/signup', signUp)
 
