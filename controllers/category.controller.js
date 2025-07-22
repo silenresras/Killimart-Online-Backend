@@ -94,16 +94,17 @@ export const deleteCategory = async (req, res) => {
 };
 
 export const getProductsByCategory = async (req, res) => {
-  const categoryName = req.query.category;
+  const categorySlug = req.query.slug;
 
   try {
-    // Find the category object first by name
-    const category = await Category.findOne({ name: categoryName });
+    // Find the category by slug
+    const category = await Category.findOne({ slug: categorySlug });
+
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    // Now find products with the matching category ID
+    // Find products that belong to this category
     const products = await Product.find({ category: category._id });
 
     res.status(200).json(products);
@@ -111,4 +112,6 @@ export const getProductsByCategory = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch products by category", error });
   }
 };
+
+
 
