@@ -217,37 +217,38 @@ export const forgotPassword = async (req, res) => {
     }
   };
 
-export const checkAuth = async (req, res) => {
-    const token = req.cookies.token;
-
+  export const checkAuth = async (req, res) => {
+    // 1) Header beats cookie
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+                  ? authHeader.split(' ')[1]
+                  : req.cookies.token;
+  
     if (!token) {
-        return res.status(401).json({ isAuthenticated: false });
+      return res.status(401).json({ isAuthenticated: false });
     }
-
+  
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        const user = await User.findById(decoded.id);
-
-        if (!user) {
-            return res.json({ isAuthenticated: false });
-        }
-
-        res.json({
-            isAuthenticated: true,
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                lastLogin: user.lastLogin,
-            },
-        });
-    } catch (error) {
-        console.error("Token verification failed:", error);
-        res.json({ isAuthenticated: false });
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+  
+      res.json({
+        isAuthenticated: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          lastLogin: user.lastLogin,
+        },
+      });
+    } catch {
+      res.status(401).json({ isAuthenticated: false });
     }
-};
+  };
   
 
 export const getMe = async (req, res) => {
