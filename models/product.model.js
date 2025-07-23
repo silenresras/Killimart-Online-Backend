@@ -43,8 +43,6 @@ const productSchema = new mongoose.Schema({
   },
 
   // 🧰 Common Fields
-  colors: { type: [String], default: [] },
-  sizes: { type: [String], default: [] },
   stock: { type: Number, default: 0 },
   images: { type: [String], default: [] },
 

@@ -11,8 +11,6 @@ export const createProduct = async (req, res) => {
       price,
       discount,
       description,
-      sizes,
-      colors,
       stock,
       images,
       category, // should be a category _id
@@ -36,8 +34,6 @@ export const createProduct = async (req, res) => {
       price,
       discount,
       description,
-      sizes,
-      colors,
       stock,
       images,
       category,
