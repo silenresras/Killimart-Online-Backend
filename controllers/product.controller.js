@@ -158,4 +158,46 @@ export const updateProduct = async (req, res) => {
 };
 
 
-  
+// Search for product name suggestions
+export const searchProductSuggestions = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const regex = new RegExp(q, "i"); // case-insensitive partial match
+
+    const products = await Product.find(
+      { name: regex },
+      { name: 1, slug: 1, _id: 1 } // return only what's needed
+    ).limit(10); // limit results
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Search error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+// Full product search (used in /search page)
+export const searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const regex = new RegExp(q, "i"); // case-insensitive match
+
+    const products = await Product.find({ name: regex }).populate("category");
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Search error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
