@@ -4,6 +4,7 @@ import {
   getMyOrders,
   getAllOrders,
   updateOrderStatus,
+  getOrderById
 } from '../controllers/order.controller.js';
 
 import { protect } from '../middleware/protect.js';       // ✅ Auth middleware
@@ -22,5 +23,9 @@ router.get('/admin/orders', protect, isAdmin, getAllOrders);
 
 // 🛠 Admin updates order status (paid, shipped, etc.)
 router.patch('/admin/orders/:id/status', protect, isAdmin, updateOrderStatus);
+
+router.get('/admin/orders/:id', protect, isAdmin, getOrderById);
+
+
 
 export default router;
