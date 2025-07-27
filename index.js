@@ -11,6 +11,8 @@ import productRoutes from './routes/product.route.js';
 import categoryRoutes from './routes/category.route.js'
 import MpesaRoutes from './routes/mpesa.route.js';
 import orderRoutes from './routes/order.route.js'
+import chatRoutes from './routes/chat.route.js'
+import TrainRoutes from './routes/training.route.js'
 
 const authRoutes = router
 dotenv.config();
@@ -52,6 +54,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/mpesa", MpesaRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api', chatRoutes)
+app.use('/api/admin', TrainRoutes)
 
 
 
