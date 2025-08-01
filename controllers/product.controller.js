@@ -201,3 +201,32 @@ export const searchProducts = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export const getRelatedProducts = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // Find the current product
+    const product = await Product.findOne({ slug });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Find other products in the same category, excluding the current one
+    const relatedProducts = await Product.find({
+      category: product.category,
+      slug: { $ne: slug }, // exclude the current product
+    })
+      .limit(18) // limit to 8 related items
+      .select("name slug images price category") // return only necessary fields
+      .populate("category", "name");
+
+    res.status(200).json(relatedProducts);
+  } catch (error) {
+    console.error("Error fetching related products:", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
