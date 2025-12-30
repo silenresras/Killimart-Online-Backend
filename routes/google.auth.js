@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 
+
 const router = express.Router();
 
 // Start Google login

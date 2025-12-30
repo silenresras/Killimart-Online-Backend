@@ -1,69 +1,32 @@
 {
-  "name": "backend-auth-api",
+  "name": "killimart-online-backend",
   "version": "1.0.0",
+  "description": "Backend for Killimart Online",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-<<<<<<< HEAD
     "start": "node -r dotenv/config index.js",
     "dev": "nodemon -r dotenv/config index.js"
-=======
-    "dev": "nodemon index.js",
-    "start": "node index.js"
->>>>>>> origin/main
   },
   "keywords": [],
-  "author": "",
-  "type": "module",
-  "license": "ISC",
-  "description": "",
+  "author": "Felix Mugambi",
+  "license": "MIT",
   "dependencies": {
-    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
-<<<<<<< HEAD
-    "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "dotenv": "^16.6.1",
-    "express": "^4.21.0",
-    "express-session": "^1.18.2",
-    "helmet": "^8.1.0",
-    "js-base64": "^3.7.7",
-    "jsonwebtoken": "^9.0.2",
-    "mailtrap": "^4.4.0",
-    "moment": "^2.30.1",
-    "mongoose": "^8.7.0",
-    "multer": "^1.4.5-lts.2",
-    "multer-storage-cloudinary": "^2.2.1",
-    "ngrok": "^5.0.0-beta.2",
-    "nodemailer": "^7.0.12",
-    "nodemon": "^3.1.7",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-=======
-    "cloudinary": "^1.41.3",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "helmet": "^8.1.0",
-    "js-base64": "^3.7.7",
-    "jsonwebtoken": "^9.0.2",
-    "mailtrap": "^3.4.0",
-    "moment": "^2.30.1",
-    "mongoose": "^8.7.0",
-    "multer": "^1.4.5-lts.2",
-    "multer-storage-cloudinary": "^4.0.0",
-    "ngrok": "^5.0.0-beta.2",
-    "nodemailer": "^6.9.15",
-    "nodemon": "^3.1.7",
->>>>>>> origin/main
-    "slugify": "^1.6.6"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "helmet": "^7.0.0",
+    "js-base64": "^3.7.5",
+    "jsonwebtoken": "^9.0.1",
+    "mongoose": "^7.6.1",
+    "nodemailer": "^6.9.4",
+    "passport": "^0.7.2"
   },
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.7",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0"
+    "nodemon": "^3.0.1"
   }
 }

@@ -1,9 +1,5 @@
 import express from 'express';
-<<<<<<< HEAD
 import { signUp, login, logout, forgotPassword, resetPassword, checkAuth, getMe, addShippingAddress,
-=======
-import { signUp, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, getMe, addShippingAddress,
->>>>>>> origin/main
     deleteShippingAddress, editShippingAddress,
     getShippingAddresses, getDefaultShippingAddress} from '../controllers/auth.controller.js';
 import { protect } from '../middleware/protect.js';
@@ -11,10 +7,6 @@ import { protect } from '../middleware/protect.js';
 const router = express.Router()
 // Auth
 router.post('/signup', signUp)
-<<<<<<< HEAD
-=======
-router.post('/verify-email', verifyEmail)
->>>>>>> origin/main
 router.post('/login', login)
 router.post('/logout', logout)
 router.get('/check-auth', protect, checkAuth)
