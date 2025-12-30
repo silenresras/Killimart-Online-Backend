@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -72,6 +73,73 @@ export const signUp = async (req, res) => {
 };
 
 /*export const verifyEmail = async (req, res) => {
+=======
+import crypto from 'crypto';
+import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken'
+import { decode } from "js-base64";
+import { encode } from 'js-base64';
+
+
+import { User } from "../models/user.model.js";
+import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js'
+import { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from '../mailtrap/email.js'
+
+export const signUp = async (req, res) => {
+    const { name, email, password } = req.body;
+
+    try {
+        if (!name || !email || !password) {
+            throw new Error("All fields are required")
+        }
+
+        // Email validation (basic regex for format)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            throw new Error("Invalid email format");
+        }
+
+        const userAlreadyExists = await User.findOne({ email })
+
+        if (userAlreadyExists) {
+            return res.status(400).json({ success: false, message: 'User already exists' })
+        }
+
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString()
+
+        const user = new User({
+            name,
+            email,
+            password: hashedPassword,
+            verificationToken,
+            verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000 //24hrs
+        })
+
+        await user.save();
+
+        //jwt
+        generateTokenAndSetCookie(res, user._id)
+
+        await sendVerificationEmail(user.email, user.name, verificationToken);
+
+
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
+            user: {
+                ...user._doc,
+                password: undefined,
+            }
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ success: false, message: error.message })
+    }
+}
+
+export const verifyEmail = async (req, res) => {
+>>>>>>> origin/main
     const { code } = req.body
     try {
         const user = await User.findOne({
@@ -102,6 +170,7 @@ export const signUp = async (req, res) => {
     }
 
 }
+<<<<<<< HEAD
 */
 
 export const login = async (req, res) => {
@@ -176,6 +245,59 @@ export const logout = async (req, res) => {
 
 ////DISABLED FORGOT PASSWORD
 /*export const forgotPassword = async (req, res) => {
+=======
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'User not found' });
+        }
+
+        const isPasswordMatch = await bcryptjs.compare(password, user.password);
+
+        if (!isPasswordMatch) {
+            return res.status(400).json({ success: false, message: 'Incorrect password' });
+        }
+
+        // Generate JWT and set as cookie
+        const token = generateTokenAndSetCookie(res, user._id);
+
+        // Update last login date
+        user.lastLogin = new Date();
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'User logged in successfully',
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.role === 'admin',
+                lastLogin: user.lastLogin,
+            },
+            token: token
+        });
+
+    } catch (error) {
+        console.log("Error logging in the user", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+
+
+
+export const logout = async (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ success: true, message: "logged out successfully" });
+}
+
+export const forgotPassword = async (req, res) => {
+>>>>>>> origin/main
     const { email } = req.body;
   
     try {
@@ -210,6 +332,7 @@ export const logout = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
     }
   };
+<<<<<<< HEAD
   */
 
 /////TEMP FORGOT PASSWORD
@@ -223,6 +346,10 @@ export const forgotPassword = async (req, res) => {
 
 ////DISABLED FORGOT PASSWORD
 /*export const resetPassword = async (req, res) => {
+=======
+
+  export const resetPassword = async (req, res) => {
+>>>>>>> origin/main
     const { uidb64, token } = req.params;
     const { password } = req.body;
   
@@ -259,6 +386,7 @@ export const forgotPassword = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
     }
   };
+<<<<<<< HEAD
   */
 
 /////TEMP resetPassword
@@ -313,6 +441,57 @@ export const getMe = async (req, res) => {
     console.error("failed:", error);
     res.status(500).json({ message: "Failed to get user info" });
   }
+=======
+
+  export const checkAuth = async (req, res) => {
+    // 1) Header beats cookie
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+                  ? authHeader.split(' ')[1]
+                  : req.cookies.token;
+  
+    if (!token) {
+      return res.status(401).json({ isAuthenticated: false });
+    }
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+  
+      res.json({
+        isAuthenticated: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          lastLogin: user.lastLogin,
+        },
+      });
+    } catch {
+      res.status(401).json({ isAuthenticated: false });
+    }
+  };
+  
+
+export const getMe = async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id).select('-password');
+      res.json({
+        _id: user._id,
+        name:  user.name,  
+        email: user.email,
+        role: user.role,
+      });
+    } catch (error) {
+      console.error("failed:", error);
+      res.status(500).json({ message: "Failed to get user info" });
+    }
+  
+>>>>>>> origin/main
 };
 
 export const addShippingAddress = async (req, res) => {
@@ -355,6 +534,11 @@ export const addShippingAddress = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/main
 export const deleteShippingAddress = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -392,6 +576,14 @@ export const deleteShippingAddress = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+>>>>>>> origin/main
 // In controller
 export const getShippingAddresses = async (req, res) => {
   try {
@@ -400,6 +592,10 @@ export const getShippingAddresses = async (req, res) => {
     const user = await User.findById(userId).select("shippingAddress");
     if (!user) return res.status(404).json({ message: "User not found" });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
     res.status(200).json({
       shippingAddress: user.shippingAddress,
     });
@@ -409,10 +605,19 @@ export const getShippingAddresses = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 export const editShippingAddress = async (req, res) => {
   try {
     const userId = req.user._id;
     const addressId = req.params.addressId;
+=======
+
+
+export const editShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const addressId = req.params.addressId; 
+>>>>>>> origin/main
     const { county, subCounty, town, phoneNumber, isDefault } = req.body;
 
     if (!addressId || !county || !subCounty || !town || !phoneNumber) {
@@ -452,6 +657,10 @@ export const editShippingAddress = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 export const getDefaultShippingAddress = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -459,6 +668,7 @@ export const getDefaultShippingAddress = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
+<<<<<<< HEAD
     const defaultAddress = user.shippingAddress.find(
       (addr) => addr.isDefault === true
     );
@@ -467,6 +677,12 @@ export const getDefaultShippingAddress = async (req, res) => {
       return res
         .status(404)
         .json({ message: "No default shipping address found" });
+=======
+    const defaultAddress = user.shippingAddress.find(addr => addr.isDefault === true);
+
+    if (!defaultAddress) {
+      return res.status(404).json({ message: "No default shipping address found" });
+>>>>>>> origin/main
     }
 
     res.status(200).json({ defaultAddress });
@@ -475,3 +691,9 @@ export const getDefaultShippingAddress = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> origin/main
